@@ -7,11 +7,13 @@ MineFieldType: Type = TypeVar("MineFieldType", bound="MineField")
 
 class MineField:
     def __init__(self, rows: int, columns: int, mines: int) -> None:
+        self.mines:   int = mines
+        self.rows:    int = rows
+        self.columns: int = columns
         self.minefield_state: List[List[int]] = \
             [[SpotState.Untouched for _ in range(rows)] for _ in range(columns)]
         self.minefield: List[List[int]] = \
             [[SpotValue.Nothing for _ in range(rows)] for _ in range(columns)]
-        self.mines: int = mines
 
     @classmethod
     def generate(cls: Type[MineFieldType], rows: int, columns: int, mines: int) -> MineFieldType:
