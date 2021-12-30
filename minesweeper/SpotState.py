@@ -1,3 +1,3 @@
 
 class SpotState:
-    Flagged, Untouched, Revealed = range(3)
+    Flagged, Hidden, Revealed = range(3)
