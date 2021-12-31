@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtCore import QCoreApplication, Qt
+from PyQt5 import QtGui
 from .SpotState import SpotState
 from .SpotValue import SpotValue
 from typing import List, Type, TypeVar
@@ -16,21 +17,19 @@ class Spot(QPushButton):
         self.state = state
         self.value = value
 
-        super().clicked.connect(self.clicked)
+        # super().clicked.connect(self.clicked)
 
     def getGameText(self) -> str:
         if self.state == SpotState.Revealed:
             return " " if self.value == 0 else str(self.value) if self.value < 9 else "B"
         return "!" if self.state == SpotState.Flagged else " "
-
-    def clicked(self) -> None:
-        print(f"CLICKED row: {self.row + 1} col: {self.col + 1}")
-        return
-        if qApp.mouseButtons() & Qt.LeftButton:
+    
+    def mousePressEvent(self, e: QtGui.QMouseEvent) -> None:
+        if e.button() == Qt.LeftButton:
             self.state = SpotState.Revealed
             self.setText(QCoreApplication.translate("scrollArea", self.getGameText()))
-        elif qApp.mouseButtons() & Qt.RightButton:
+        elif e.button() == Qt.RightButton:
             if self.state == SpotState.Revealed:
                 return
-            self.state = SpotState.Flagged if self.state == SpotState.Untouched else SpotState.Untouched
+            self.state = SpotState.Flagged if self.state == SpotState.Hidden else SpotState.Untouched
             self.setText(QCoreApplication.translate("scrollArea", self.getGameText()))
