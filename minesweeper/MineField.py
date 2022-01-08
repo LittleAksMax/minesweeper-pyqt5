@@ -55,7 +55,7 @@ class MineField(QWidget):
         x = y = 0 # starting positions, non-zero for a bit of padding
         for row in range(self.rows):
             for col in range(self.columns):
-                spot = Spot(row, col, MineField.get_neighbors((row, col), self.rows, self.columns))
+                spot = Spot(row, col)
                 spot.setEnabled(True)
                 spot.setFixedSize(QSize(spot_size, spot_size))
                 spot.setObjectName(f"spot_{x}_{y}")
@@ -66,9 +66,11 @@ class MineField(QWidget):
                 x += spot_size
             y += spot_size # newline
             x = 0               # carriage return
+        for row in range(self.rows):
+            for col in range(self.columns):
+                self.spots[row * self.columns + col].neighbors = self.get_neighbors((row, col), self.rows, self.columns)
     
-    @staticmethod
-    def get_neighbors(spot: Tuple[int, int], rows: int, columns: int) -> List[Tuple[int, int]]:
+    def get_neighbors(self, spot: Tuple[int, int], rows: int, columns: int) -> List[Spot]:
         row, col = spot
         up:    bool = row > 0
         down:  bool = row < rows - 1
@@ -76,21 +78,21 @@ class MineField(QWidget):
         right: bool = col < columns - 1
         neighbors: List[Tuple[int, int]] = []  # tuple is [row, col]
         if left:
-            neighbors.append((row, col - 1))
+            neighbors.append(self.spots[row * self.columns + col - 1])
         if right:
-            neighbors.append((row, col + 1))
+            neighbors.append(self.spots[row * self.columns + col + 1])
         if up:
-            neighbors.append((row - 1, col))
+            neighbors.append(self.spots[(row - 1) * self.columns + col])
         if down:
-            neighbors.append((row + 1, col))
+            neighbors.append(self.spots[(row + 1) * self.columns + col])
         if left and up:
-            neighbors.append((row - 1, col - 1))
+            neighbors.append(self.spots[(row - 1) * self.columns + col - 1])
         if left and down:
-            neighbors.append((row + 1, col - 1))
+            neighbors.append(self.spots[(row + 1) * self.columns + col - 1])
         if right and up:
-            neighbors.append((row - 1, col + 1))
+            neighbors.append(self.spots[(row - 1) * self.columns + col + 1])
         if right and down:
-            neighbors.append((row + 1, col + 1))
+            neighbors.append(self.spots[(row + 1) * self.columns + col + 1])
         return neighbors
 
     @classmethod
@@ -111,6 +113,6 @@ class MineField(QWidget):
             minefield.mines.append(spot)
 
             # update each neighbor
-            for neighbor_row, neighbor_col in spot.neighbors:
-                minefield.spots[neighbor_row * minefield.columns + neighbor_col].value += 1
+            for neighbor in spot.neighbors:
+                neighbor.value += 1
         return minefield
