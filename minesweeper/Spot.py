@@ -34,7 +34,6 @@ class Spot(QPushButton):
             # not enough bombs flagged to flood_fill
             return
         seen.add(self)
-        print(self.neighboring_mines, self.value)
         for neighbor in self.neighbors:
             if neighbor.state != SpotState.Flagged:
                 neighbor.flood_fill(seen)
